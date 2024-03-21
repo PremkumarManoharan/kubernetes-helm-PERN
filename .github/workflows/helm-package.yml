@@ -30,4 +30,4 @@ jobs:
           helm push pern-chart-0.1.0.tgz oci://us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart
 
       - name: Verify chart in GCP Artifact Registry
-        run: gcloud artifacts packages list --repository=helm-repo --location=${{ secrets.REGION }}
+        run: gcloud artifacts packages list --repository=kubenetes-helm-chart --location=us-east1
