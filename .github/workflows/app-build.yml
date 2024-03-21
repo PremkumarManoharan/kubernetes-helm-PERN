@@ -1,9 +1,7 @@
 name: Build and Push Docker Image
 
 on:
-  push:
-    branches:
-      - main  # Adjust to match the branches you want to trigger this action
+  workflow_dispatch:
 
 jobs:
   setup-build-publish:
