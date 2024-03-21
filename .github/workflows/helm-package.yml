@@ -1,9 +1,7 @@
 name: Package and Push Helm Chart
 
 on:
-  push:
-    branches:
-      - main  
+    workflow_dispatch:
 
 jobs:
   setup-build-publish-chart:
@@ -26,9 +24,6 @@ jobs:
       
       - name: Package Helm chart
         run: helm package ./pern-chart
-
-      - name: Configure Helm for GCP Artifact Registry
-        run: helm repo add kubenetes-helm-chart https://us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart && helm repo update
 
       - name: Push Helm chart
         run: |
