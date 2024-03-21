@@ -27,18 +27,12 @@ jobs:
       - name: Package Helm chart
         run: helm package ./pern-chart -d ./helm-charts
 
-      - name: Get version from Chart.yaml
-        id: chart_version
-        uses: mikefarah/yq@4.25.1
-        with:
-          cmd: 'yq eval .version ./pern-chart/Chart.yaml -N'
-
       - name: Configure Helm for GCP Artifact Registry
         run: helm repo add kubenetes-helm-chart us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart && helm repo update
 
       - name: Push Helm chart
         run: |
-          helm push ./helm-charts/pern-chart-${{ steps.chart_version.outputs.result }}.tgz oci://us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart
+          helm push ./helm-charts/pern-chart.tgz oci://us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart
 
       - name: Verify chart in GCP Artifact Registry
         run: gcloud artifacts packages list --repository=helm-repo --location=${{ secrets.REGION }}
