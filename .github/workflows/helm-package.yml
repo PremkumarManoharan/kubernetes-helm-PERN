@@ -25,14 +25,14 @@ jobs:
         run: gcloud auth configure-docker us-east1-docker.pkg.dev --quiet
 
       - name: Package Helm chart
-        run: helm package ./pern-chart -d ./helm-charts
+        run: helm package ./pern-chart
 
       - name: Configure Helm for GCP Artifact Registry
         run: helm repo add kubenetes-helm-chart us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart && helm repo update
 
       - name: Push Helm chart
         run: |
-          helm push ./helm-charts/pern-chart.tgz oci://us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart
+          helm push pern-chart-0.1.0.tgz oci://us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart
 
       - name: Verify chart in GCP Artifact Registry
         run: gcloud artifacts packages list --repository=helm-repo --location=${{ secrets.REGION }}
