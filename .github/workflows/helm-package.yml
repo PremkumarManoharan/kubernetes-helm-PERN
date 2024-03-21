@@ -1,0 +1,44 @@
+name: Package and Push Helm Chart
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  setup-build-publish-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/setup-gcloud@v0.2.1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Gcloud CLI
+        run: gcloud auth configure-docker us-east1-docker.pkg.dev --quiet
+
+      - name: Package Helm chart
+        run: helm package ./pern-chart -d ./helm-charts
+
+      - name: Get version from Chart.yaml
+        id: chart_version
+        uses: mikefarah/yq@4.25.1
+        with:
+          cmd: 'yq eval .version ./pern-chart/Chart.yaml -N'
+
+      - name: Configure Helm for GCP Artifact Registry
+        run: helm repo add kubenetes-helm-chart us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart && helm repo update
+
+      - name: Push Helm chart
+        run: |
+          helm push ./helm-charts/pern-chart-${{ steps.chart_version.outputs.result }}.tgz oci://us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/kubenetes-helm-chart
+
+      - name: Verify chart in GCP Artifact Registry
+        run: gcloud artifacts packages list --repository=helm-repo --location=${{ secrets.REGION }}
