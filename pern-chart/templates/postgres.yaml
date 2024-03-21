@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-{{.Values.postgres.name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.Values.postgres.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.postgres.name}}
+    spec:
+      containers:
+      - name: {{.Values.postgres.name}}
+        image: {{.Values.postgres.image.repository}}:{{.Values.postgres.image.tag}}
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{.Release.Name}}-{{.Values.secret.name}}
+              key: PG_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{.Release.Name}}-{{.Values.secret.name}}
+              key: PG_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: {{.Release.Name}}-{{.Values.secret.name}}
+              key: PG_DB
+        ports:
+        - containerPort: {{.Values.postgres.containerPort}}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-storage
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: {{.Release.Name}}-{{ .Values.persistantVolumeClaim.name}}-pvc

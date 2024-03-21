@@ -1,0 +1,53 @@
+# Default values for pern-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+webapp:
+  replicaCount: 1
+  name: webapp
+  image:
+    repository: us-east1-docker.pkg.dev/kubernetes-417903/kubernetes-webapp/webapp
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+postgres:
+  replicaCount: 1
+  name: postgres
+  containerPort: 5432
+  image:
+    repository: postgres
+    pullPolicy: IfNotPresent
+    tag: "14.11-alpine3.19"
+
+secret:
+  name: postgres-secret
+  PG_DB: webapp
+  PG_USER: webapp
+persistantVolume:
+  name: postgres
+  storageClassName: hostpath
+  capacity:
+    storage: 200Mi
+  accessModes: 
+   - ReadWriteOnce
+  hostPath:
+    path: /Users/premkumarmanoharan/desktop/kubernetes/volumes/postgres
+
+
+persistantVolumeClaim:
+  name: postgres
+  storageClassName: hostpath
+  accessModes: 
+   - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+      
+services:
+  webapp:
+    name: webapp-svc
+    port: 3000
+    targetPort: 3000
+  postgres:
+    name: postgres-svc
+    port: 5432

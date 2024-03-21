@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  PG_DB: {{ .Values.secret.PG_DB | b64enc }}
+  PG_HOST: {{.Values.services.postgres.name| b64enc }}
+  PG_PASSWORD: {{ randAlphaNum 8 | b64enc }}
+  PG_USER: {{ .Values.secret.PG_USER | b64enc }}
+kind: Secret
+metadata:
+  name: {{.Release.Name}}-{{.Values.secret.name}}

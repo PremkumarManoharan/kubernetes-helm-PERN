@@ -1,0 +1,35 @@
+name: Packer-Format-validate
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  packer-format-validate:
+        runs-on: ubuntu-latest
+        
+        steps:
+        - name: Update Ubuntu
+          run: sudo apt update
+
+        - uses: actions/checkout@v2
+
+        - name: Setup packer
+          uses: hashicorp/setup-packer@main
+
+        - name: Zip All Content
+          run: |
+            zip -r build.zip .
+        
+        - name: Run packer init
+          run: "packer init ./packer/appBuildImage.pkr.hcl"
+        
+        - name: Run packer fmt
+          run: |
+            packer fmt packer/
+            git diff --exit-code || (echo "Packer template is not formatted. Please run 'packer fmt' locally and commit the changes." && exit 1)
+        
+        - name: Run packer validate
+          run: packer validate -var-file=packer/variables.pkrvars.hcl packer/
