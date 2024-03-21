@@ -1,65 +1,89 @@
-# Cloud Native Web Application
+# PERN Stack Application on Kubernetes
 
-## Overview
-
-This web application is a backend API developed using Node.js and Express, with PostgreSQL as the chosen database. Below are the steps to download, set up, and run the application.
+This repository contains a PERN (PostgreSQL, Express.js, React, Node.js) stack application designed for deployment on a highly scalable Kubernetes cluster. The application is containerized and managed using Helm charts for streamlined deployment and scalability. Additionally, this repository includes a GitHub Actions workflow for automated building and pushing of the application images to Google Cloud Platform's (GCP) Artifact Registry.
 
 ## Prerequisites
 
-Before getting started, make sure you have the following installed on your system:
+Before you begin, ensure you have the following installed and configured:
 
-- Node.js
-- npm (Node Package Manager)
-- PostgreSQL
+- Docker
+- Kubernetes Cluster
+- Helm 3
+- Google Cloud SDK (gcloud)
+- Configured GCP Artifact Registry repository
 
-## Installation and Setup
+## Getting Started
 
-1. **Download and Unzip**
-
-    Download the application from the Canvas platform and unzip the provided ZIP file.
-
-2. **Install Dependencies**
-
-    Open a terminal in the root folder of the application and run the following command:
+1. **Clone the Repository**
 
     ```bash
+    git clone https://github.com/<your-username>/<your-repo-name>.git
+    cd <your-repo-name>
+    ```
+
+2. **Configure GCP Credentials**
+
+    Ensure that your GCP credentials are configured correctly to allow access to the Artifact Registry. Follow [GCP's documentation](https://cloud.google.com/artifact-registry/docs/docker/authentication) for setting up authentication.
+
+3. **Install Dependencies**
+
+    Navigate to the application directory and install the necessary Node.js dependencies:
+
+    ```bash
+    cd app
     npm install
     ```
 
-3. **Create .env file**
+4. **Local Development**
 
-    Create a file named `.env` in the root folder and add the following content:
-
-    ```env
-    PG_USER=your_postgres_user
-    PG_PASSWORD=your_postgres_password
-    PG_DB=your_database_name
-    PG_HOST=your_postgres_host
-    ```
-
-    Replace `your_postgres_user`, `your_postgres_password`, `your_database_name`, and `your_postgres_host` with your PostgreSQL credentials.
-
-4. **Start PostgreSQL**
-
-    - Run the following command to start the PostgreSQL server:
-
-        ```bash
-        sudo systemctl start postgresql
-        ```
-
-5. **Start the Application**
-
-    In the root folder of the application, run the following command to start accepting requests:
+    Run the application locally for development purposes:
 
     ```bash
     npm start
     ```
 
-6. **Test the Application**
+## Deploying with Helm
 
-    Use a tool like Postman to test the functionality of the application. Send requests to the defined API endpoints.
+This repository includes a Helm chart (`pern-chart`) for deploying the application to a Kubernetes cluster.
 
-## Additional Notes
+1. **Navigate to the Helm Chart Directory**
 
-- Ensure that the PostgreSQL server is running before starting application.
-- The application is now ready to handle requests.
+    ```bash
+    cd charts/pern-chart
+    ```
+
+2. **Install the Helm Chart**
+
+    Customize `values.yaml` as needed for your environment, then install the Helm chart:
+
+    ```bash
+    helm install my-pern-app .
+    ```
+
+3. **Verify Deployment**
+
+    Check the status of your deployment:
+
+    ```bash
+    helm ls
+    kubectl get pods
+    ```
+
+## Continuous Integration and Delivery (CI/CD)
+
+The `.github/workflows/setup-build-publish.yml` workflow is configured for continuous integration and delivery. This workflow automates the process of building the Docker image for the application, pushing it to the GCP Artifact Registry, and deploying it to the Kubernetes cluster using Helm.
+
+### Workflow Steps:
+
+1. **Build Image**: The application image is built using Docker.
+2. **Push Image to GCP Artifact Registry**: The built image is tagged and pushed to the configured GCP Artifact Registry.
+3. **Update Helm Chart**: The Helm chart is updated with the new image tag.
+4. **Deploy to Kubernetes**: The updated Helm chart is deployed to the Kubernetes cluster.
+
+## Contributing
+
+We welcome contributions! Please read our contributing guidelines before submitting pull requests.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
